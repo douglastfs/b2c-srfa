@@ -1,0 +1,27 @@
+<isdecorate template="common/layout/page">
+    <isscript>
+        var assets = require('*/cartridge/scripts/assets.js');
+        assets.addCss('/css/teste.css');
+        assets.addJs('/js/addCartMsg.js')
+    </isscript>
+    <section class="home-page">
+        <div class="container_product">
+            <img class="image_product" src="${pdict.product.image}" alt="${pdict.product.name}"/>
+            <div class="container_data_product">
+                <h1>${pdict.product.name}</h1>
+                <p class="short_description">${pdict.product.shortDescription}</p>
+
+                <isif condition="${pdict.product.hasStock}">
+                    <div class="product-price">${pdict.product.price}</div>
+                    <button class="add-btn" type="button" data-add-msg="${pdict.addToCartMessage}" >
+                        ${pdict.addCart}
+                    </button>
+                <iselse/>
+                    <button disabled type="button" class="not-available-btn">
+                        ${pdict.productNotAvailable}
+                    </button>
+                </isif>
+            </div>
+        </div>
+    </section>
+</isdecorate>

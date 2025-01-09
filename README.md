@@ -22,6 +22,7 @@ The latest version of SFRA is 5.3.0
 
 4. Create `dw.json` file in the root of the project:
 ```json
+
 {
     "hostname": "your-sandbox-hostname.demandware.net",
     "username": "yourlogin",

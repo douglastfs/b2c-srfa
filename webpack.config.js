@@ -1,10 +1,45 @@
 'use strict';
 
 var path = require('path');
+var shell = require('shelljs');
 var webpack = require('sgmf-scripts').webpack;
 var ExtractTextPlugin = require('sgmf-scripts')['extract-text-webpack-plugin'];
-var jsFiles = require('sgmf-scripts').createJsPath();
-var scssFiles = require('sgmf-scripts').createScssPath();
+
+function getCartridges() {
+    var cwd = process.cwd();
+    var packageJson = require(path.join(cwd, './package.json'));
+    var cartridges = packageJson.cartridges || ['app_storefront_base'];
+
+    cartridges = cartridges.map(cartridge => { return path.join(cwd, 'cartridges', cartridge); });
+    cartridges = cartridges.filter(cartridge => { return shell.find(path.join(cartridge, 'cartridge/client/')).stdout !== ''; });
+
+    return cartridges;
+}
+
+function getFiles(cartridges, type) {
+
+    var files = {}, isJS = type === 'js';
+    type = isJS ? 'js/**/*.js' : 'scss/**/*.scss';
+
+    cartridges.forEach(cartridge => {
+        shell.ls(path.join(cartridge, 'cartridge/client/**/', type)).forEach(file => {
+
+            var name = isJS ? '' : path.basename(file, `.scss`);
+
+            if (name.indexOf('_') !== 0) {
+                var location = path.relative(path.join(cartridge, `cartridge/client`), file).replace(/\\/g, "/");
+                location = isJS ? location.substr(0, location.length - 3) : location.substr(0, location.length - 5).replace('scss', 'css');
+                files[`./cartridges/${path.basename(cartridge)}/cartridge/static/` + location] = file;
+            }
+        });
+    });
+
+    return files;
+};
+
+var cartridges = getCartridges();
+var jsFiles = getFiles(cartridges, 'js');
+var scssFiles = getFiles(cartridges, 'scss');
 
 var bootstrapPackages = {
     Alert: 'exports-loader?Alert!bootstrap/js/src/alert',
@@ -25,7 +60,7 @@ module.exports = [{
     name: 'js',
     entry: jsFiles,
     output: {
-        path: path.resolve('./cartridges/app_storefront_base/cartridge/static'),
+        path: path.resolve(__dirname),
         filename: '[name].js'
     },
     module: {
@@ -43,13 +78,15 @@ module.exports = [{
             }
         ]
     },
-    plugins: [new webpack.ProvidePlugin(bootstrapPackages)]
+    plugins: [
+      new webpack.ProvidePlugin(bootstrapPackages)
+    ]
 }, {
     mode: 'none',
     name: 'scss',
     entry: scssFiles,
     output: {
-        path: path.resolve('./cartridges/app_storefront_base/cartridge/static'),
+        path: path.resolve(__dirname),
         filename: '[name].css'
     },
     module: {

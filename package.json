@@ -125,5 +125,8 @@
       "pre-commit": "npm run lint",
       "pre-push": "npm run test"
     }
-  }
+  },
+  "cartridges": [
+    "app_storefront_base" , "app_douglas_teste"
+  ]
 }

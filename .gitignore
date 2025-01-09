@@ -28,6 +28,7 @@ npm-debug.log
 cartridges.zip
 .idea/
 dw.json
+launch.json
 sitegenesisdata/
 mobilefirstdata/
 storefrontdata/
